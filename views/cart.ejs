@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+  <!-- Bootstrap CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="/css/tiny-slider.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+  <title>Cart</title>
+</head>
+
+<body>
+
+  <%- include('header') %>
+
+  <!-- Start Hero Section -->
+  <div class="hero">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+            <h1>Cart</h1>
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+      </div>
+    </div>
+  </div>
+  <!-- End Hero Section -->
+
+  <div class="untree_co-section before-footer-section">
+    <div class="container">
+      <div class="row mb-5">
+        <form class="col-md-12" method="post">
+          <div class="site-blocks-table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="product-thumbnail">Image</th>
+                  <th class="product-name">Product</th>
+                  <th class="product-price">Price</th>
+                  <th class="product-quantity">Quantity</th>
+                  <th class="product-total">Total</th>
+                  <th class="product-remove">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (cartItems && cartItems.length > 0) { %>
+                  <% cartItems.forEach(item => { %>
+                    <tr>
+                      <td class="product-thumbnail">
+                        <% if (item.image_url) { %>
+                          <img src="<%= item.image_url %>" alt="<%= item.name %>" class="img-fluid">
+                        <% } else { %>
+                          <img src="/images/placeholder.png" alt="No Image" class="img-fluid">
+                        <% } %>
+                      </td>
+                      <td class="product-name">
+                        <h2 class="h5 text-black"><%= item.name %></h2>
+                      </td>
+                      <td>
+                        <% if (item.price !== undefined && !isNaN(item.price)) { %>
+                          $<%= Number(item.price).toFixed(2) %>
+                        <% } else { %>
+                          Price not available
+                        <% } %>
+                      </td>
+                      <td>
+                        <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+                          <div class="input-group-prepend">
+                            <button class="btn btn-outline-black decrease" type="button" onclick="updateQuantity('<%= item.id %>', -1)">−</button>
+                          </div>
+                          <input type="text" class="form-control text-center quantity-amount" value="<%= item.quantity %>" disabled>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-black increase" type="button" onclick="updateQuantity('<%= item.id %>', 1)">+</button>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <% if (item.price !== undefined && !isNaN(item.price)) { %>
+                          $<%= (item.price * item.quantity).toFixed(2) %>
+                        <% } else { %>
+                          N/A
+                        <% } %>
+                      </td>
+                      <td><a href="#" class="btn btn-black btn-sm" onclick="removeFromCart('<%= item.id %>')">X</a></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" class="text-center">Your cart is empty.</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+
+      <% if (cartItems && cartItems.length > 0) { %>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mb-5">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <button class="btn btn-black btn-sm btn-block" onclick="updateCart()">Update Cart</button>
+              </div>
+              <div class="col-md-6">
+                <a href="/shop" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 pl-5">
+            <div class="row justify-content-end">
+              <div class="col-md-7">
+                <div class="row">
+                  <div class="col-md-12 text-right border-bottom mb-5">
+                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <span class="text-black">Subtotal</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">$<%= cartItems.reduce((acc, item) => acc + (item.price || 0) * item.quantity, 0).toFixed(2) %></strong>
+                  </div>
+                </div>
+                <div class="row mb-5">
+                  <div class="col-md-6">
+                    <span class="text-black">Total</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">$<%= cartItems.reduce((acc, item) => acc + (item.price || 0) * item.quantity, 0).toFixed(2) %></strong>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <a href="/checkout" class="btn btn-black btn-lg py-3 btn-block">Proceed To Checkout</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <%- include('footer') %>
+
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/tiny-slider.js"></script>
+  <script src="/js/custom.js"></script>
+
+  <script>
+    function updateQuantity(productId, change) {
+      fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId, change })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert('Failed to update cart');
+        }
+      });
+    }
+
+    function removeFromCart(productId) {
+      fetch('/cart/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert('Failed to remove product');
+        }
+      });
+    }
+
+    function updateCart() {
+      // This function can be used to trigger any cart updates (if needed)
+      window.location.reload();
+    }
+  </script>
+</body>
+
+</html>

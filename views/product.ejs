@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="product-page">
+    <%- include('header') %> <!-- Include your consistent navbar -->
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Carousel for product images -->
+            <div class="col-md-6">
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <% product.images.forEach((image, index) => { %>
+                            <% if (image) { %> <!-- Check if the image exists -->
+                                <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                    <img src="<%= image %>" class="d-block w-100" alt="<%= product.title %>">
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                    <!-- Show carousel controls only if more than 1 image exists -->
+                    <% if (product.images.filter(image => image).length > 1) { %> 
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Product details section -->
+            <div class="col-md-6">
+                <h1><%= product.title %></h1>
+
+                <!-- Star Rating Logic -->
+                <div class="product-rating">
+                    <% 
+                        const totalReviews = product.reviews.length;
+                        const averageRating = totalReviews > 0 
+                            ? (product.reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews).toFixed(1) 
+                            : 0;
+                    %>
+                    <div class="stars">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                            <% if (i <= Math.floor(averageRating)) { %>
+                                <i class="bi bi-star-fill text-warning"></i> <!-- Filled Star -->
+                            <% } else if (i === Math.ceil(averageRating) && !Number.isInteger(averageRating)) { %>
+                                <i class="bi bi-star-half text-warning"></i> <!-- Half Star -->
+                            <% } else { %>
+                                <i class="bi bi-star text-warning"></i> <!-- Unfilled Star -->
+                            <% } %>
+                        <% } %>
+                    </div>
+                    <div class="reviews">
+                        <%= totalReviews %> Reviews
+                    </div>
+                </div>
+
+                <!-- Product Price and Add to Cart Button -->
+                <div class="product-price my-3">$<%= Number(product.price).toFixed(2) %></div>
+                <button class="btn btn-primary" onclick="addToCart('<%= product.id %>')">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and Script for Add to Cart functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addToCart(productId) {
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId, quantity: 1 }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const addToCartModal = new bootstrap.Modal(document.getElementById('addToCartModal'));
+                    addToCartModal.show();
+                } else {
+                    alert('Failed to add product to cart. Please try again.');
+                }
+            })
+            .catch(error => console.error('Error adding product to cart:', error));
+        }
+    </script>
+
+    <!-- Modal for Add to Cart Confirmation -->
+    <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addToCartModalLabel">Product Added</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            The product has been added to your cart.
+          </div>
+          <div class="modal-footer">
+            <a href="/cart" class="btn btn-success">Go to Checkout</a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('footer') %> <!-- Include your consistent footer -->
+</body>
+</html>

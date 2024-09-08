@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <!-- Template's Bootstrap and main CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/tiny-slider.css">
+
+    <style>
+        /* Custom CSS to position the message at the top */
+        #logoutMessage {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 9999;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Include custom navigation bar -->
+    <%- include('header') %>
+
+    <!-- Hero Section -->
+    <div class="hero" style="background-color: #3b5d50;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1>Shop the Best Sports Equipment</h1>
+                    <p>Explore our collection of top-tier gear and equipment for all your sports needs.</p>
+                    <a href="/shop" class="btn btn-primary">Shop Now</a>
+                </div>
+                <div class="col-md-6">
+                    <img src="/images/header.webp" alt="Sports Equipment" class="img-fluid"> <!-- Placeholder for the hero image -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <section class="product-section py-5">
+        <div class="container">
+            <div class="row">
+                <% if (products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <div class="col-md-4 mb-4">
+                            <div class="product-item">
+                                <div class="product-thumbnail mb-3">
+                                    <% if (product.images && product.images[0]) { %>
+                                        <img src="<%= product.images[0] %>" class="img-fluid" alt="<%= product.title %>">
+                                    <% } else { %>
+                                        <img src="/images/placeholder.png" class="img-fluid" alt="No image available">
+                                    <% } %>
+                                </div>
+                                <h3><%= product.title %></h3>
+                                <p><%= product.description %></p>
+                                <% if (product.price !== null && !isNaN(product.price)) { %>
+                                    <strong class="text-primary">$<%= Number(product.price).toFixed(2) %></strong>
+                                <% } else { %>
+                                    <strong class="text-danger">Price not available</strong>
+                                <% } %>
+                                <div class="mt-2">
+                                    <a href="/product/<%= product.id %>" class="btn btn-outline-primary">View Product</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-center">No products available at this time. Please check back later.</p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logout Success Message -->
+    <% if (message) { %>
+        <div class="alert alert-success text-center" id="logoutMessage">
+            <%= message %>
+        </div>
+        <script>
+            // Make the logout message disappear after 5 seconds without redirecting
+            setTimeout(function() {
+                const logoutMessage = document.getElementById('logoutMessage');
+                if (logoutMessage) {
+                    logoutMessage.style.display = 'none';
+                }
+            }, 5000);
+        </script>
+    <% } %>
+
+    <!-- Include custom footer -->
+    <%- include('footer') %>
+
+    <!-- JS and Bootstrap Scripts -->
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/tiny-slider.js"></script>
+    <script src="/js/custom.js"></script>
+</body>
+</html>
